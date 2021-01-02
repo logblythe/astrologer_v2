@@ -1,0 +1,48 @@
+name: astrologer
+description: A new Flutter application.
+
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+version: 1.0.8+9
+
+environment:
+  sdk: ">=2.7.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  intl:
+  camera: 0.6.3+2
+  provider:
+  image_picker:
+  connectivity:
+  http:
+  shared_preferences:
+  sqflite:
+  path_provider:
+  rxdart:
+  firebase_core:
+  firebase_messaging: 6.0.16
+  flutter_local_notifications:
+  expandable:
+  random_color:
+  in_app_purchase: ^0.3.4+3
+  google_fonts: ^1.1.1
+  platform_device_id: ^0.1.3
+  cupertino_icons: ^1.0.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_launcher_icons: "^0.7.3"
+
+
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/logo.png"
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/

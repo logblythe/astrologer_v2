@@ -1,0 +1,63 @@
+import 'package:astrologer/core/service/api.dart';
+import 'package:astrologer/core/service/db_provider.dart';
+import 'package:astrologer/core/service/home_service.dart';
+import 'package:astrologer/core/service/navigation_service.dart';
+import 'package:astrologer/core/service/user_service.dart';
+import 'package:astrologer/core/utils/local_notification_helper.dart';
+import 'package:astrologer/core/utils/purchase_helper.dart';
+import 'package:astrologer/core/utils/shared_pref_helper.dart';
+import 'package:provider/provider.dart';
+import 'package:provider/single_child_widget.dart';
+
+List<SingleChildWidget> providers = [
+  ...independentServices,
+  ...dependentServices,
+  ...uiConsumableProviders
+];
+
+List<SingleChildWidget> independentServices = [
+  Provider.value(value: Api()),
+  Provider.value(value: SharedPrefHelper()),
+  Provider.value(value: DbProvider()),
+  Provider.value(value: LocalNotificationHelper()),
+  Provider.value(value: NavigationService()),
+  Provider.value(value: PurchaseHelper()),
+];
+
+List<SingleChildWidget> dependentServices = [
+  ProxyProvider3<Api, DbProvider, SharedPrefHelper, UserService>(
+    update: (context, api, dbProvider, sharedPrefH, userService) => UserService(
+        api: api, dbProvider: dbProvider, sharedPrefHelper: sharedPrefH),
+  ),
+  ProxyProvider5<Api, DbProvider, SharedPrefHelper, LocalNotificationHelper,
+      PurchaseHelper, HomeService>(
+    update: (context, api, dbProvider, sharedPrefH, localNotificationH,
+            purchaseHelper, homeService) =>
+        HomeService(
+            api: api,
+            db: dbProvider,
+            sharedPrefHelper: sharedPrefH,
+            localNotificationHelper: localNotificationH,
+            purchaseHelper: purchaseHelper),
+  ),
+];
+
+List<SingleChildWidget> uiConsumableProviders = [
+  StreamProvider<int>(
+    initialData: 0,
+    create: (context) =>
+        Provider.of<HomeService>(context, listen: false).freeCountStream,
+    updateShouldNotify: (_, __) => true,
+  ),
+  StreamProvider<String>(
+    create: (context) =>
+        Provider.of<UserService>(context, listen: false).profilePic,
+    updateShouldNotify: (_, __) => true,
+  ),
+  /*
+  StreamProvider<UtilityModel>(
+    update: (context) =>
+    Provider.of<AdsService>(context, listen: false).utilityStream,
+    updateShouldNotify: (_, __) => true,
+  )*/
+];

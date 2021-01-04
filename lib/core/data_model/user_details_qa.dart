@@ -15,22 +15,24 @@ class UserDetailsWithQA {
   String phoneNumber;
   bool accurateTime;
   List<QuestionAnswerHistory> questionAnswerHistoryList;
+  String deviceToken;
 
   UserDetailsWithQA(
       {this.userId,
-        this.firstName,
-        this.lastName,
-        this.email,
-        this.gender,
-        this.city,
-        this.state,
-        this.country,
-        this.profileImageUrl,
-        this.dateOfBirth,
-        this.birthTime,
-        this.phoneNumber,
-        this.accurateTime,
-        this.questionAnswerHistoryList});
+      this.firstName,
+      this.lastName,
+      this.email,
+      this.gender,
+      this.city,
+      this.state,
+      this.country,
+      this.profileImageUrl,
+      this.dateOfBirth,
+      this.birthTime,
+      this.phoneNumber,
+      this.accurateTime,
+      this.questionAnswerHistoryList,
+      this.deviceToken});
 
   UserDetailsWithQA.fromJson(Map<String, dynamic> json) {
     userId = json['userId'];
@@ -46,11 +48,11 @@ class UserDetailsWithQA {
     birthTime = json['birthTime'];
     phoneNumber = json['phoneNumber'];
     accurateTime = json['accurateTime'];
+    deviceToken = json['deviceToken'];
     if (json['questionAnswerHistoryList'] != null) {
-      questionAnswerHistoryList = new List<QuestionAnswerHistory>();
+      questionAnswerHistoryList = [];
       json['questionAnswerHistoryList'].forEach((v) {
-        questionAnswerHistoryList
-            .add(new QuestionAnswerHistory.fromJson(v));
+        questionAnswerHistoryList.add(new QuestionAnswerHistory.fromJson(v));
       });
     }
   }

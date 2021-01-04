@@ -45,7 +45,8 @@ class PurchaseHelper {
 
     final QueryPurchaseDetailsResponse purchaseResponse =
         await _connection.queryPastPurchases();
-    if (purchaseResponse.error == null) {
+    if (purchaseResponse.error == null &&
+        purchaseResponse.pastPurchases.length > 0) {
       PurchaseDetails purchaseDetails =
           purchaseResponse.pastPurchases.elementAt(0);
       if (Platform.isAndroid) {

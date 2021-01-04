@@ -66,7 +66,4 @@ class HomeViewModel extends BaseViewModel {
     await _homeService.fetchQuestionPrice();
     setBusy(false);
   }
-
-  showLocalNotification(String title, String body) async =>
-      await _homeService.showLocalNotification(title, body);
 }

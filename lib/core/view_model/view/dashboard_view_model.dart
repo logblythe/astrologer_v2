@@ -81,13 +81,12 @@ class DashboardViewModel extends BaseViewModel {
 
   askQuestion(MessageModel message) async {
     _question = message;
-    await _homeService.makeQuestionRequest(_question);
     setBusy(true);
-    /* if (_homeService.isFree) {
+     if (_homeService.isFree) {
       await _homeService.makeQuestionRequest(_question);
     } else {
       _homeService.purchaseHelper.purchase();
-    }*/
+    }
     setBusy(false);
   }
 

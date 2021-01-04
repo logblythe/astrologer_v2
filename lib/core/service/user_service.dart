@@ -36,11 +36,11 @@ class UserService {
     _getFcmToken();
   }
 
-  Future<String> _getFcmToken() async {
+  void _getFcmToken() async {
     if (_fcmToken == null) {
       _fcmToken = await FirebaseMessaging().getToken();
     }
-    return _fcmToken;
+    print('fcmtoken $_fcmToken');
   }
 
   Future<UserModel> getLoggedInUser() async {
@@ -51,7 +51,7 @@ class UserService {
   Future<UserModel> updateUser(
       UserModel user, bool newUser, String deviceId) async {
     if (newUser) user.userId = 0;
-    UserModel userModel = await _api.registerUser(user, deviceId,_fcmToken);
+    UserModel userModel = await _api.registerUser(user, deviceId, _fcmToken);
     if (userModel.errorMessage == null) {
       if (newUser) {
         _db.addUser(userModel);

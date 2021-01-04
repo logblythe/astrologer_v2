@@ -1,4 +1,6 @@
-const String baseUrl = "http://144.91.121.115:8082/api";
+// const String baseUrl = "http://144.91.121.115:8082/api";
+// const String baseUrl = "http://a6eaf9fbedd4.ngrok.io/api";
+const String baseUrl = "http://api.cosmosastrology.com/api";
 const String welcomeMessages = "$baseUrl/user/welcome-messages";
 const String userHistory = "$baseUrl/user/previous-history";
 const String register = "$baseUrl/user/register";

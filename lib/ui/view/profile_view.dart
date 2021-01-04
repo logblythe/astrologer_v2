@@ -102,7 +102,6 @@ class _ProfileViewState extends State<ProfileView> with ValidationMixing {
                         controller: phoneController,
                         validator: isEmptyValidation,
                         keyboardType: TextInputType.number,
-                        maxLength: 10,
                       ),
                       UIHelper.verticalSpaceMedium,
                       DateTimeRow(
@@ -192,7 +191,7 @@ class _ProfileViewState extends State<ProfileView> with ValidationMixing {
       user.birthTime = timeController.text;
       user.accurateTime = model.accurateTime;
       user.gender = model.selectedGender == null
-          ? null
+          ? "F"
           : model.selectedGender == Gender.male
               ? "M"
               : "F";
@@ -219,6 +218,12 @@ class _ProfileViewState extends State<ProfileView> with ValidationMixing {
       stateController.text = user.state;
       countryController.text = user.country;
       phoneController.text = user.phoneNumber;
+      if (user.gender != null) {
+        model.selectedGender = user.gender == "M" ? Gender.male : Gender.female;
+      }
+      if (user.accurateTime != null) {
+        model.accurateTime = user.accurateTime;
+      }
     }
   }
 }

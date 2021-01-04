@@ -3,23 +3,23 @@ import 'package:astrologer/core/data_model/astrologer_model.dart';
 import 'package:astrologer/core/data_model/idea_model.dart';
 import 'package:astrologer/core/data_model/message_model.dart';
 import 'package:astrologer/core/data_model/qa_history_list.dart';
+import 'package:astrologer/core/data_model/user_details_qa.dart';
 import 'package:astrologer/core/data_model/user_history.dart';
 import 'package:astrologer/core/data_model/user_model.dart';
 import 'package:astrologer/core/service/api.dart';
 import 'package:astrologer/core/service/db_provider.dart';
-import 'package:astrologer/core/utils/local_notification_helper.dart';
 import 'package:astrologer/core/utils/purchase_helper.dart';
 import 'package:astrologer/core/utils/shared_pref_helper.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:platform_device_id/platform_device_id.dart';
 import 'package:rxdart/rxdart.dart';
 
 class HomeService {
-  final DbProvider _dbProvider;
+  final DbProvider _db;
   final Api _api;
   final SharedPrefHelper _sharedPrefHelper;
-  final LocalNotificationHelper _localNotificationHelper;
   final PurchaseHelper _purchaseHelper;
 
   int _prevQuesId;
@@ -28,12 +28,10 @@ class HomeService {
     @required DbProvider db,
     @required Api api,
     @required SharedPrefHelper sharedPrefHelper,
-    @required LocalNotificationHelper localNotificationHelper,
     @required PurchaseHelper purchaseHelper,
-  })  : _dbProvider = db,
+  })  : _db = db,
         _api = api,
         _sharedPrefHelper = sharedPrefHelper,
-        _localNotificationHelper = localNotificationHelper,
         _purchaseHelper = purchaseHelper;
 
   PublishSubject<MessageAndUpdate> _newMessage = PublishSubject();
@@ -97,25 +95,30 @@ class HomeService {
 
   Future<void> init() async {
     _messageList.clear();
-    _user = await _dbProvider.getLoggedInUser();
+    _user = await _db.getLoggedInUser();
     await initPlatformState();
     UserHistory history = await _api.fetchUserHistory(deviceId: _deviceId);
-    if (_user == null && history.userDetailsWithQA != null) {
+    UserDetailsWithQA details = history.userDetailsWithQA;
+    if (details != null) {
       UserModel user = UserModel(
-        userId: history.userDetailsWithQA.userId,
-        firstName: history.userDetailsWithQA.firstName,
-        lastName: history.userDetailsWithQA.lastName,
-        phoneNumber: history.userDetailsWithQA.phoneNumber,
-        gender: history.userDetailsWithQA.gender,
-        city: history.userDetailsWithQA.city,
-        state: history.userDetailsWithQA.state,
-        country: history.userDetailsWithQA.country,
-        dateOfBirth: history.userDetailsWithQA.dateOfBirth,
-        birthTime: history.userDetailsWithQA.birthTime,
-        accurateTime: history.userDetailsWithQA.accurateTime,
-        profileImageUrl: history.userDetailsWithQA.profileImageUrl,
+        userId: details.userId,
+        firstName: details.firstName,
+        lastName: details.lastName,
+        phoneNumber: details.phoneNumber,
+        gender: details.gender,
+        city: details.city,
+        state: details.state,
+        country: details.country,
+        dateOfBirth: details.dateOfBirth,
+        birthTime: details.birthTime,
+        accurateTime: details.accurateTime,
+        profileImageUrl: details.profileImageUrl,
       );
-      _dbProvider.addUser(user);
+      _user == null ? await _db.addUser(user) : await _db.updateUser(user);
+      String deviceToken = await FirebaseMessaging().getToken();
+      if (deviceToken != details.deviceToken) {
+        await _api.registerUser(user, deviceId, deviceToken);
+      }
     }
     List<String> welcomeMessage = history.welcomeMessages;
     welcomeMessage.forEach((element) {
@@ -124,22 +127,21 @@ class HomeService {
     List<QuestionAnswerHistory> qaList =
         history.userDetailsWithQA?.questionAnswerHistoryList;
     qaList?.forEach((qa) {
-      addMessage(MessageModel(
-        message: qa.engQuestion,
-        sent: true,
-        status: qa.answer.isNotEmpty ? DELIVERED : NOT_DELIVERED,
-      ));
-      addMessage(MessageModel(
-          message: qa.answer,
-          sent: false,
-          astrologer: qa.repliedBy,
-          astrologerUrl: qa.profileImgUrl));
+      addMessage(
+          MessageModel(message: qa.engQuestion, sent: true, status: qa.status));
+      qa.answer != null
+          ? addMessage(MessageModel(
+              message: qa.answer,
+              sent: false,
+              astrologer: qa.repliedBy,
+              astrologerUrl: qa.profileImgUrl))
+          : Container();
     });
   }
 
   Future<int> addMessage(MessageModel message) async {
     message.createdAt = DateTime.now().millisecondsSinceEpoch;
-    _id = await _dbProvider.addMessage(message);
+    _id = await _db.addMessage(message);
     message.id = _id;
     _messageList.add(message);
     return _id;
@@ -149,7 +151,7 @@ class HomeService {
     for (int i = 0; i < _messageList.length; i++) {
       if (_messageList[i].questionId == questionId) {
         _messageList[i].status = status;
-        await _dbProvider.updateQuestionStatus(questionId, status);
+        await _db.updateQuestionStatus(questionId, status);
         if (status == QuestionStatus.UNCLEAR) {
           _prevQuesId = questionId;
           _freeCount = _freeCount + 1;
@@ -163,13 +165,10 @@ class HomeService {
   }
 
   Future<void> updateQuestionStatusById(int id, String status) async {
-    print('Status $status $id');
     for (int i = 0; i < _messageList.length; i++) {
-      print('at $i ${_messageList[i].toMapForDb()}');
       if (_messageList[i].id == id) {
-        print('inside $i ${_messageList[i].toMapForDb()}');
         _messageList[i].status = status;
-        await _dbProvider.updateQuestionStatusById(id, status);
+        await _db.updateQuestionStatusById(id, status);
       }
     }
   }
@@ -194,12 +193,8 @@ class HomeService {
     }
   }
 
-  showLocalNotification(String title, String body) async {
-    await _localNotificationHelper.showNotification(title: title, body: body);
-  }
-
   makeQuestionRequest(messageModel) async {
-    _user = await _dbProvider.getLoggedInUser();
+    _user = await _db.getLoggedInUser();
     Map<String, dynamic> messageResponse = await _api.askQuestion(
       _user.userId,
       messageModel.message,
@@ -217,7 +212,7 @@ class HomeService {
         addFreeCountToSink(_freeCount);
       }
     }
-    await _dbProvider.updateMessage(messageModel, _id);
+    await _db.updateMessage(messageModel, _id);
   }
 }
 

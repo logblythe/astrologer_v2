@@ -3,6 +3,7 @@ import 'package:astrologer/core/enum/gender.dart';
 import 'package:astrologer/core/service/home_service.dart';
 import 'package:astrologer/core/service/user_service.dart';
 import 'package:astrologer/core/view_model/base_view_model.dart';
+import 'package:platform_device_id/platform_device_id.dart';
 
 class ProfileViewModel extends BaseViewModel {
   final UserService _userService;
@@ -19,7 +20,7 @@ class ProfileViewModel extends BaseViewModel {
   ProfileViewModel({UserService userService, HomeService homeService})
       : this._userService = userService,
         this._homeService = homeService {
-    _homeService.init();
+    // _homeService.init();
   }
 
   UserModel get user => _userService.user;
@@ -28,6 +29,7 @@ class ProfileViewModel extends BaseViewModel {
 
   getLoggedInUser() async {
     setBusy(true);
+    await _userService.getLoggedInUser();
     accurateTime = user?.accurateTime;
     selectedGender = user?.gender == "M" ? Gender.male : Gender.female;
     setBusy(false);
@@ -36,7 +38,7 @@ class ProfileViewModel extends BaseViewModel {
   Future<UserModel> updateUser(UserModel user) async {
     setBusy(true);
     bool newUser = user.userId == null;
-    String deviceId = _homeService.deviceId;
+    String deviceId = await PlatformDeviceId.getDeviceId;
     UserModel userModel =
         await _userService.updateUser(user, newUser, deviceId);
     setBusy(false);

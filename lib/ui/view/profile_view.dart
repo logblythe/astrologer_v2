@@ -181,8 +181,13 @@ class _ProfileViewState extends State<ProfileView> with ValidationMixing {
       if (user == null) {
         user = new UserModel();
       }
+      List<String> name = nameController.text.trim().split(" ");
       user.firstName = nameController.text.split(" ").elementAt(0);
-      user.lastName = nameController.text.split(" ").elementAt(1) ?? "";
+      if(name.length>1){
+        user.lastName = nameController.text.split(" ").elementAt(1) ?? "";
+      }else{
+        user.lastName="";
+      }
       user.phoneNumber = phoneController.text;
       user.city = locationController.text;
       user.state = stateController.text;
@@ -211,7 +216,7 @@ class _ProfileViewState extends State<ProfileView> with ValidationMixing {
   void initializeValue(ProfileViewModel model) {
     user = model.user;
     if (user != null) {
-      nameController.text = "${user.firstName} ${user.lastName}";
+      nameController.text = "${user.firstName} ${user.lastName??""}";
       locationController.text = user.city;
       dateController.text = user.dateOfBirth;
       timeController.text = user.birthTime;

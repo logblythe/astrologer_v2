@@ -19,9 +19,7 @@ class ProfileViewModel extends BaseViewModel {
 
   ProfileViewModel({UserService userService, HomeService homeService})
       : this._userService = userService,
-        this._homeService = homeService {
-    // _homeService.init();
-  }
+        this._homeService = homeService;
 
   UserModel get user => _userService.user;
 

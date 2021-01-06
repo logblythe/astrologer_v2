@@ -16,7 +16,6 @@ class Api {
   String token;
 
   Future<UserHistory> fetchUserHistory({String deviceId}) async {
-    print('deviceId $deviceId');
     var response = await client.get("$userHistory/$deviceId",
         headers: {"Content-Type": "application/json"});
     UserHistory history = UserHistory.fromJson(jsonDecode(response.body));
@@ -26,26 +25,21 @@ class Api {
   Future<UserModel> registerUser(
       UserModel user, String deviceId, String deviceToken) async {
     try {
-      print('Registration response ${jsonEncode(user.toMapForDb())}');
-      var response = await client.post(register,
+      http.Response response = await client.post(register,
           headers: {"Content-Type": "application/json"},
           body: jsonEncode(
               user.toMapForApi(deviceId: deviceId, deviceToken: deviceToken)));
-      print('Registration response $response');
-      print('Registration response ${jsonDecode(response.body)}');
+      print('hello ${jsonDecode(response.body)}');
       switch (response.statusCode) {
         case 200:
-          print('case 200');
           return UserModel.fromJson(jsonDecode(response.body));
         case 409:
-          print('case 409');
           return UserModel.fromError(jsonDecode(response.body));
         default:
           return UserModel.error(
               error: "Something went wrong. Please try again");
       }
     } catch (e) {
-      print('we are here');
       return UserModel.error(error: e.toString());
     }
   }
@@ -53,7 +47,6 @@ class Api {
   Future<Map<String, dynamic>> askQuestion(
       int userId, String question, double questionPrice,
       {int prevQuestionId}) async {
-    print('userId $userId');
     try {
       var response = await client.post(
         askQuestionUrl,
@@ -67,10 +60,8 @@ class Api {
           },
         ),
       );
-      print('the ask question response ${response.statusCode}${response.body}');
       return jsonDecode(response.body);
     } catch (e) {
-      print('ASK QUESTION the response exception $e}');
       return null;
     }
   }
@@ -83,7 +74,6 @@ class Api {
           "Content-Type": "application/json",
         },
       );
-      print('response fetchAstrologers ${response.statusCode}${response.body}');
       List<dynamic> astrologers = jsonDecode(response.body);
       return astrologers.map((json) => AstrologerModel.fromJson(json)).toList();
     } catch (e) {

@@ -69,6 +69,18 @@ class _HomeViewState extends State<HomeView> with ConnectivityMixin {
   void initState() {
     super.initState();
     _pageController = PageController();
+
+    //request notification permissions for iOS device.
+    //For Android, this call is equivalent to no-op.
+    //More info here: https://pub.dev/packages/firebase_messaging#dartflutter-integration
+    _fcm.requestNotificationPermissions(
+        const IosNotificationSettings(sound: true, badge: true, alert: true));
+
+    _fcm.onIosSettingsRegistered.listen((IosNotificationSettings settings) {
+      print(
+          "Settings registered for iOS device: $settings"); //for debug purposes
+    });
+
     _fcm.configure(
       onMessage: (Map<String, dynamic> message) async =>
           _onNotificationReceived(message),

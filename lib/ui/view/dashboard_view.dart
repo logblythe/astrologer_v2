@@ -141,8 +141,8 @@ class _DashboardViewState extends State<DashboardView>
       } else {
         var _message =
             MessageModel(message: _messageController.text.trim(), sent: true);
-        final _listState = widget.listKey.currentState;
         await model.addMessage(_message);
+        final _listState = widget.listKey.currentState;
         if (_listState != null)
           _listState.insertItem(0, duration: Duration(milliseconds: 500));
         // await model.askQuestion(_message);

@@ -42,6 +42,8 @@ class DashboardViewModel extends BaseViewModel {
 
   UserModel get user => _userService.user;
 
+  getUserInfo() => _userService.getLoggedInUser();
+
   MessageModel _question;
 
   init() async {
@@ -73,16 +75,11 @@ class DashboardViewModel extends BaseViewModel {
   }
 
   Future<void> addMessage(MessageModel message) async {
-    setBusy(true);
-    _homeService.addMsgToSink("", true);
-    _messageId = await _homeService.addMessage(message);
-    setBusy(false);
-  }
-
-  askQuestion(MessageModel message) async {
     _question = message;
     setBusy(true);
-     if (_homeService.isFree) {
+    _homeService.addMsgToSink("", true);
+    _messageId = await _homeService.addMessage(_question);
+    if (_homeService.isFree) {
       await _homeService.makeQuestionRequest(_question);
     } else {
       _homeService.purchaseHelper.purchase();
@@ -95,6 +92,4 @@ class DashboardViewModel extends BaseViewModel {
     await _homeService.updateQuestionStatusById(_messageId, status);
     setBusy(false);
   }
-
-  getUserInfo() => _userService.getLoggedInUser();
 }

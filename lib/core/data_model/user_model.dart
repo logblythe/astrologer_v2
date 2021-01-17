@@ -84,7 +84,7 @@ class UserModel {
         "role": role,
         "dateOfBirth": dateOfBirth,
         "birthTime": birthTime,
-        "accurateTime": accurateTime,
+        "accurateTime": accurateTime ? 1: 0,
         "profileImageUrl": profileImageUrl,
       };
 

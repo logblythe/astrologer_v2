@@ -62,18 +62,19 @@ class _DashboardViewState extends State<DashboardView>
       child: model.fetchingList
           ? const Center(child: CircularProgressIndicator())
           : AnimatedList(
+              primary: true,
               key: widget.listKey,
               initialItemCount: model.messages?.length,
               reverse: true,
               shrinkWrap: true,
               padding: EdgeInsets.all(8.0),
-              itemBuilder: (context, index, animation) {
-                MessageModel _message = model.messages[index];
+              itemBuilder: (context, i, animation) {
+                MessageModel _message = model.messages[i];
                 return MessageItem(
                   darkMode: false,
                   message: _message,
                   animation: animation,
-                  item: index,
+                  item: i,
                   onTap: () {},
                 );
               },
@@ -139,12 +140,12 @@ class _DashboardViewState extends State<DashboardView>
             });
       } else {
         var _message =
-            MessageModel(message: _messageController.text, sent: true);
+            MessageModel(message: _messageController.text.trim(), sent: true);
+        await model.addMessage(_message);
         final _listState = widget.listKey.currentState;
         if (_listState != null)
           _listState.insertItem(0, duration: Duration(milliseconds: 500));
-        await model.addMessage(_message);
-        await model.askQuestion(_message);
+        // await model.askQuestion(_message);
       }
     }
   }

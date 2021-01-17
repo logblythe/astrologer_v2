@@ -16,7 +16,7 @@ class Api {
   String token;
 
   Future<UserHistory> fetchUserHistory({String deviceId}) async {
-    var response = await client.get("$userHistory/$deviceId",
+    var response = await client.get("$userHistory/abcd",
         headers: {"Content-Type": "application/json"});
     UserHistory history = UserHistory.fromJson(jsonDecode(response.body));
     return history;

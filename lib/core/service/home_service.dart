@@ -214,6 +214,16 @@ class HomeService {
     }
     await _db.updateMessage(messageModel, _id);
   }
+
+  Future<bool> isRequestFromNepal() async {
+    bool isNepali = await _sharedPrefHelper.getBool(KEY_NEPALI);
+    if (isNepali == null) {
+      bool nepali = await _api.isRequestFromNepal();
+      _sharedPrefHelper.setBool(KEY_NEPALI, nepali);
+      return nepali;
+    }
+    return isNepali;
+  }
 }
 
 class MessageAndUpdate {

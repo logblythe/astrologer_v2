@@ -9,6 +9,7 @@ const String askQuestionUrl = "$baseUrl/user/ask-question";
 const String fetchAstrologersUrl = "$baseUrl/user/fetch-astrologers";
 const String fetchQuestionPriceUrl = "$baseUrl/user/question-price";
 const String uploadProfile = "$baseUrl/user/upload-profile-picture";
+const String IPIFY_API_KEY = "at_fbaNCdRelumktbfnIs0fP6uqyxgbS";
 
 const List<String> country = [
   "Select One",

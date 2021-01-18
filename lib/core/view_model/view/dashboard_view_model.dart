@@ -79,12 +79,25 @@ class DashboardViewModel extends BaseViewModel {
     setBusy(true);
     _homeService.addMsgToSink("", true);
     _messageId = await _homeService.addMessage(_question);
-    if (_homeService.isFree) {
-      await _homeService.makeQuestionRequest(_question);
-    } else {
-      _homeService.purchaseHelper.purchase();
-    }
     setBusy(false);
+  }
+
+  askQuestion(MessageModel message) async {
+    setBusy(true);
+    await _homeService.makeQuestionRequest(_question);
+      if (_homeService.isFree) {
+        await _homeService.makeQuestionRequest(_question);
+      } else {
+        bool nepali = await _homeService.isRequestFromNepal();
+        if (nepali) {
+          //use esewa or khalti
+          print('the request is from nepal');
+        } else {
+          print('else the request is from nepal');
+          _homeService.purchaseHelper.purchase();
+        }
+      }
+      setBusy(false);
   }
 
   updateQuestionStatusById(String status) async {

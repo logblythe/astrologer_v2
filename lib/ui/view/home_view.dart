@@ -1,5 +1,6 @@
 import 'package:astrologer/connectivity_mixin.dart';
 import 'package:astrologer/core/data_model/notification_model.dart';
+import 'package:astrologer/core/message_listener.dart';
 import 'package:astrologer/core/view_model/view/home_view_model.dart';
 import 'package:astrologer/ui/base_widget.dart';
 import 'package:astrologer/ui/shared/route_paths.dart';
@@ -50,7 +51,16 @@ class _HomeViewState extends State<HomeView> with ConnectivityMixin {
           title: titleWidget(model),
           actions: <Widget>[_buildIconButton(model)],
         ),
-        body: _buildWillPopScope(model),
+        // body: _buildWillPopScope(model),
+        body: MessageListener<HomeViewModel>(
+          child: _buildWillPopScope(model),
+          showError: (error) {
+            print('the error $error');
+          },
+          showInfo: (info) {
+            print('the info $info');
+          },
+        ),
       ),
     );
   }
@@ -293,6 +303,7 @@ class _HomeViewState extends State<HomeView> with ConnectivityMixin {
     }, onDisconnected: () {
       model.internetConnection = false;
     });
+    model.setError("hello this is dummy error");
   }
 
   @override

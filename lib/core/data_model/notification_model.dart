@@ -1,3 +1,4 @@
+import 'dart:io' show Platform;
 
 class NotificationModel {
   Notification notification;
@@ -12,7 +13,13 @@ class NotificationModel {
     notification = json['notification'] != null
         ? new Notification.fromJson(Map.from(json['notification']))
         : null;
-    data = json['data'] != null ? new Data.fromJson(Map.from(json['data'])) : null;
+    if (Platform.isAndroid) {
+      data = json['data'] != null
+          ? new Data.fromJson(Map.from(json['data']))
+          : null;
+    } else if (Platform.isIOS) {
+      data = json != null ? new Data.fromJson(Map.from(json)) : null;
+    }
   }
 
   Map<String, dynamic> toJson() {

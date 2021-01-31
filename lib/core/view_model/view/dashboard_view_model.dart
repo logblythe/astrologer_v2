@@ -79,7 +79,8 @@ class DashboardViewModel extends BaseViewModel {
     setBusy(true);
     _homeService.addMsgToSink("", true);
     _messageId = await _homeService.addMessage(_question);
-    if (_homeService.isFree) {
+    // if (_homeService.isFree) {
+    if (true) {
       await _homeService.makeQuestionRequest(_question);
     } else {
       _homeService.purchaseHelper.purchase();

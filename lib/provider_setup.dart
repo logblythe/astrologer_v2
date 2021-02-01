@@ -3,6 +3,7 @@ import 'package:astrologer/core/service/db_provider.dart';
 import 'package:astrologer/core/service/home_service.dart';
 import 'package:astrologer/core/service/navigation_service.dart';
 import 'package:astrologer/core/service/user_service.dart';
+import 'package:astrologer/core/utils/khalti_helper.dart';
 import 'package:astrologer/core/utils/purchase_helper.dart';
 import 'package:astrologer/core/utils/shared_pref_helper.dart';
 import 'package:provider/provider.dart';
@@ -20,6 +21,7 @@ List<SingleChildWidget> independentServices = [
   Provider.value(value: DbProvider()),
   Provider.value(value: NavigationService()),
   Provider.value(value: PurchaseHelper()),
+  Provider.value(value: KhaltiHelper()),
 ];
 
 List<SingleChildWidget> dependentServices = [
@@ -30,15 +32,16 @@ List<SingleChildWidget> dependentServices = [
       sharedPrefHelper: sharedPrefH,
     ),
   ),
-  ProxyProvider4<Api, DbProvider, SharedPrefHelper, PurchaseHelper,
-      HomeService>(
-    update:
-        (context, api, dbProvider, sharedPrefH, purchaseHelper, homeService) =>
-            HomeService(
-                api: api,
-                db: dbProvider,
-                sharedPrefHelper: sharedPrefH,
-                purchaseHelper: purchaseHelper),
+  ProxyProvider5<Api, DbProvider, SharedPrefHelper, PurchaseHelper,
+      KhaltiHelper, HomeService>(
+    update: (context, api, dbProvider, sharedPrefH, purchaseHelper,
+            khaltiHelper, homeService) =>
+        HomeService(
+            api: api,
+            db: dbProvider,
+            sharedPrefHelper: sharedPrefH,
+            purchaseHelper: purchaseHelper,
+            khaltiHelper: khaltiHelper),
   ),
 ];
 

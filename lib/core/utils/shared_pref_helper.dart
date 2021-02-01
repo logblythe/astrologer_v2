@@ -4,6 +4,7 @@ const String KEY_USER_ID = "key_user_id";
 const String KEY_TOKEN = "key_token";
 const String KEY_FREE_QUES_COUNT = "key_free_question_count";
 const String KEY_IMAGE_URL = "key_image_url";
+const String KEY_NEPALI = "key_nepali";
 
 class SharedPrefHelper {
   SharedPreferences _sharedPreferences;

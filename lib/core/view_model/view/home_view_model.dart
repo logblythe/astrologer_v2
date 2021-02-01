@@ -1,6 +1,7 @@
 import 'package:astrologer/core/data_model/message_model.dart';
 import 'package:astrologer/core/data_model/notification_model.dart';
 import 'package:astrologer/core/data_model/user_model.dart';
+import 'package:astrologer/core/message_notifier_mixin.dart';
 import 'package:astrologer/core/service/home_service.dart';
 import 'package:astrologer/core/service/user_service.dart';
 import 'package:astrologer/core/view_model/base_view_model.dart';

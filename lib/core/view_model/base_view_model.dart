@@ -1,7 +1,8 @@
 import 'package:astrologer/core/enum/app_state.dart';
+import 'package:astrologer/core/message_notifier_mixin.dart';
 import 'package:flutter/material.dart';
 
-class BaseViewModel extends ChangeNotifier {
+class BaseViewModel extends ChangeNotifier with MessageNotifierMixin {
   bool _isDisposed = false;
   AppState _appState = AppState.IDLE;
   bool _uploadingImage = false;
@@ -29,6 +30,7 @@ class BaseViewModel extends ChangeNotifier {
   void setError(String errorMsg) {
     _errorMsg = errorMsg;
     _appState = AppState.ERROR;
+    notifyError(_errorMsg);
     if (!_isDisposed) notifyListeners();
   }
 

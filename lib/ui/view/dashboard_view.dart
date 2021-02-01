@@ -3,6 +3,7 @@ import 'package:astrologer/core/view_model/view/dashboard_view_model.dart';
 import 'package:astrologer/ui/base_widget.dart';
 import 'package:astrologer/ui/widgets/message_item.dart';
 import 'package:astrologer/ui/widgets/no_user_dialog.dart';
+import 'package:astrologer/ui/widgets/payment_selection.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -26,7 +27,7 @@ class _DashboardViewState extends State<DashboardView>
     super.build(context);
     return BaseWidget(
       model: _dashboardViewModel,
-      onModelReady: (DashboardViewModel model) => model.init(),
+      onModelReady: handleModelReady,
       builder: (context, DashboardViewModel model, child) {
         _messageController
           ..text = model.messageBox
@@ -141,11 +142,11 @@ class _DashboardViewState extends State<DashboardView>
       } else {
         var _message =
             MessageModel(message: _messageController.text.trim(), sent: true);
-        await model.addMessage(_message);
         final _listState = widget.listKey.currentState;
         if (_listState != null)
           _listState.insertItem(0, duration: Duration(milliseconds: 500));
-        // await model.askQuestion(_message);
+        await model.addMessage(_message);
+        await model.askQuestion(_message);
       }
     }
   }
@@ -168,4 +169,22 @@ class _DashboardViewState extends State<DashboardView>
 
   @override
   bool get wantKeepAlive => true;
+
+  void handleModelReady(DashboardViewModel model) {
+    model.init();
+    model.showBottomSheet.stream.listen((event) async {
+      print('event $event');
+      if (event) {
+        var response = await showModalBottomSheet(
+            context: context,
+            builder: (context) {
+              return PaymentSelection(
+                onEsewaSelect: () => model.handleEsewaSelect(),
+                onKhaltiSelect: () => model.handleKhaltiSelect(),
+              );
+            });
+        print('the response $response');
+      }
+    });
+  }
 }

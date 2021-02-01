@@ -27,8 +27,8 @@ class Api {
     try {
       http.Response response = await client.post(register,
           headers: {"Content-Type": "application/json"},
-          body: jsonEncode(
-              user.toMapForApi(deviceId: deviceId, deviceToken: deviceToken)));
+          body: jsonEncode(user.toMapForApi(
+              deviceId: deviceId, deviceToken: deviceToken)));
       print('hello ${jsonDecode(response.body)}');
       switch (response.statusCode) {
         case 200:
@@ -137,5 +137,16 @@ class Api {
       },
     );
     return completer.future;
+  }
+
+  Future<bool> isRequestFromNepal() async {
+    var response = await client.get("https://api.ipify.org?format=json");
+    Map<String, dynamic> responseMap = jsonDecode(response.body);
+    String ip = responseMap['ip'];
+    var res = await client.get(
+        'https://geo.ipify.org/api/v1?apiKey=$IPIFY_API_KEY&ipAddress=$ip');
+    Map<String, dynamic> resMap = jsonDecode(res.body);
+    String country = resMap["location"]["country"];
+    return country == "NP";
   }
 }

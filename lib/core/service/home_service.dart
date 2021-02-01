@@ -8,6 +8,7 @@ import 'package:astrologer/core/data_model/user_history.dart';
 import 'package:astrologer/core/data_model/user_model.dart';
 import 'package:astrologer/core/service/api.dart';
 import 'package:astrologer/core/service/db_provider.dart';
+import 'package:astrologer/core/utils/khalti_helper.dart';
 import 'package:astrologer/core/utils/purchase_helper.dart';
 import 'package:astrologer/core/utils/shared_pref_helper.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -21,6 +22,7 @@ class HomeService {
   final Api _api;
   final SharedPrefHelper _sharedPrefHelper;
   final PurchaseHelper _purchaseHelper;
+  final KhaltiHelper _khaltiHelper;
 
   int _prevQuesId;
 
@@ -29,10 +31,12 @@ class HomeService {
     @required Api api,
     @required SharedPrefHelper sharedPrefHelper,
     @required PurchaseHelper purchaseHelper,
+    @required KhaltiHelper khaltiHelper,
   })  : _db = db,
         _api = api,
         _sharedPrefHelper = sharedPrefHelper,
-        _purchaseHelper = purchaseHelper;
+        _purchaseHelper = purchaseHelper,
+        _khaltiHelper = khaltiHelper;
 
   PublishSubject<MessageAndUpdate> _newMessage = PublishSubject();
   PublishSubject<int> _freeCountStream = PublishSubject();
@@ -53,6 +57,8 @@ class HomeService {
   PurchaseHelper get purchaseHelper => _purchaseHelper;
 
   SharedPrefHelper get prefHelper => _sharedPrefHelper;
+
+  KhaltiHelper get khaltiHelper => _khaltiHelper;
 
   get ideas => _ideas;
 
@@ -213,6 +219,16 @@ class HomeService {
       }
     }
     await _db.updateMessage(messageModel, _id);
+  }
+
+  Future<bool> isRequestFromNepal() async {
+    bool isNepali = await _sharedPrefHelper.getBool(KEY_NEPALI);
+    if (isNepali == null) {
+      bool nepali = await _api.isRequestFromNepal();
+      _sharedPrefHelper.setBool(KEY_NEPALI, nepali);
+      return nepali;
+    }
+    return isNepali;
   }
 }
 

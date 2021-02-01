@@ -1,11 +1,15 @@
+import 'dart:async';
+
 import 'package:astrologer/core/constants/end_points.dart';
 import 'package:astrologer/core/data_model/message_model.dart';
 import 'package:astrologer/core/data_model/user_model.dart';
 import 'package:astrologer/core/service/home_service.dart';
 import 'package:astrologer/core/service/user_service.dart';
+import 'package:astrologer/core/utils/khalti_helper.dart';
 import 'package:astrologer/core/view_model/base_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
+import 'package:rxdart/rxdart.dart';
 
 class DashboardViewModel extends BaseViewModel {
   HomeService _homeService;
@@ -34,6 +38,8 @@ class DashboardViewModel extends BaseViewModel {
   String get messageBox => _messageBox;
 
   Stream<MessageAndUpdate> get nMsgStream => _homeService.nStream;
+
+  PublishSubject<bool> showBottomSheet = PublishSubject();
 
   void addMsgToSink(message, update) =>
       _homeService.addMsgToSink(message, update);
@@ -72,6 +78,12 @@ class DashboardViewModel extends BaseViewModel {
         updateQuestionStatusById(QuestionStatus.NOT_DELIVERED);
       }
     });
+    _homeService.khaltiHelper.purchaseStream.stream.listen((map) {
+      print('${PaymentStatus.error}');
+      if (map["status"] == PaymentStatus.error) {
+        print('handle error');
+      } else {}
+    });
   }
 
   Future<void> addMessage(MessageModel message) async {
@@ -79,18 +91,44 @@ class DashboardViewModel extends BaseViewModel {
     setBusy(true);
     _homeService.addMsgToSink("", true);
     _messageId = await _homeService.addMessage(_question);
-    // if (_homeService.isFree) {
-    if (true) {
-      await _homeService.makeQuestionRequest(_question);
-    } else {
-      _homeService.purchaseHelper.purchase();
-    }
     setBusy(false);
+  }
+
+  askQuestion(MessageModel message) async {
+    showBottomSheet.sink.add(true);
+    //
+    // setBusy(true);
+    // await _homeService.makeQuestionRequest(_question);
+    // if (_homeService.isFree) {
+    //   await _homeService.makeQuestionRequest(_question);
+    // } else {
+    //   bool nepali = await _homeService.isRequestFromNepal();
+    //   if (nepali) {
+    //     print('the request is from nepal');
+    //     showBottomSheet.sink.add(true);
+    //   } else {
+    //     print('else the request is from nepal');
+    //     _homeService.purchaseHelper.purchase();
+    //   }
+    // }
+    // setBusy(false);
   }
 
   updateQuestionStatusById(String status) async {
     setBusy(true);
     await _homeService.updateQuestionStatusById(_messageId, status);
     setBusy(false);
+  }
+
+  @override
+  void dispose() {
+    showBottomSheet.close();
+    super.dispose();
+  }
+
+  handleEsewaSelect() {}
+
+  handleKhaltiSelect() {
+    _homeService.khaltiHelper.makePayment();
   }
 }

@@ -1,4 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.cosmosNepal.cosmos">
 
     <uses-permission android:name="com.android.vending.BILLING" />
@@ -6,6 +7,7 @@
     <application
         android:icon="@mipmap/launcher_icon"
         android:label="Cosmos Astrology"
+        tools:replace="android:label"
         android:usesCleartextTraffic="true">
         <activity
             android:name=".MainActivity"

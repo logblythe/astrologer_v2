@@ -64,6 +64,10 @@ android {
             minifyEnabled false
         }
     }
+
+    repositories {
+        flatDir {dirs 'libs'}
+    }
 }
 
 flutter {
@@ -71,5 +75,8 @@ flutter {
 }
 
 dependencies {
+    compile(name: 'eSewaSdk', ext: 'aar')
+    implementation 'androidx.cardview:cardview:1.0.0'
+    implementation 'com.google.android.material:material:1.2.1'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }

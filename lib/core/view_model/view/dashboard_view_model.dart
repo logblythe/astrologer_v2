@@ -1,10 +1,12 @@
 import 'dart:async';
 
 import 'package:astrologer/core/constants/end_points.dart';
+import 'package:astrologer/core/data_model/esewa_payment.dart';
 import 'package:astrologer/core/data_model/message_model.dart';
 import 'package:astrologer/core/data_model/user_model.dart';
 import 'package:astrologer/core/service/home_service.dart';
 import 'package:astrologer/core/service/user_service.dart';
+import 'package:astrologer/core/utils/esewa_helper.dart';
 import 'package:astrologer/core/utils/khalti_helper.dart';
 import 'package:astrologer/core/view_model/base_view_model.dart';
 import 'package:flutter/material.dart';
@@ -126,7 +128,14 @@ class DashboardViewModel extends BaseViewModel {
     super.dispose();
   }
 
-  handleEsewaSelect() {}
+  handleEsewaSelect() {
+    ESewaPayment payment = ESewaPayment(
+        productPrice: 1.0,
+        productName: "test",
+        productId: "test1",
+        callBackUrl: "");
+    ESewaHelper().initPayment(payment);
+  }
 
   handleKhaltiSelect() {
     _homeService.khaltiHelper.makePayment();

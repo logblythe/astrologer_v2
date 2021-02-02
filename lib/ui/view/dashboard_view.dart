@@ -35,23 +35,25 @@ class _DashboardViewState extends State<DashboardView>
               TextSelection.collapsed(offset: _messageController.text.length);
         return GestureDetector(
           onTap: () => _messageFocusNode.unfocus(),
-          child: Stack(
-            children: <Widget>[
-              Image.asset(
-                "assets/images/background.png",
-                fit: BoxFit.fill,
-                width: MediaQuery.of(context).size.width,
-              ),
-              AnimatedContainer(
-                duration: Duration(milliseconds: 500),
-                child: Column(
-                  children: <Widget>[
-                    buildListMessage(model),
-                    buildInput(model),
-                  ],
+          child: SafeArea(
+            child: Stack(
+              children: <Widget>[
+                Image.asset(
+                  "assets/images/background.png",
+                  fit: BoxFit.fill,
+                  width: MediaQuery.of(context).size.width,
                 ),
-              ),
-            ],
+                AnimatedContainer(
+                  duration: Duration(milliseconds: 500),
+                  child: Column(
+                    children: <Widget>[
+                      buildListMessage(model),
+                      buildInput(model),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         );
       },

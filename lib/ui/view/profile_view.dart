@@ -1,5 +1,6 @@
 import 'package:astrologer/core/data_model/user_model.dart';
 import 'package:astrologer/core/enum/gender.dart';
+import 'package:astrologer/core/utils/native_date_picker.dart';
 import 'package:astrologer/core/validator_mixin.dart';
 import 'package:astrologer/core/view_model/view/profile_view_model.dart';
 import 'package:astrologer/ui/base_widget.dart';
@@ -10,6 +11,9 @@ import 'package:astrologer/ui/widgets/date_time_row.dart';
 import 'package:astrologer/ui/widgets/gender_selection.dart';
 import 'package:astrologer/ui/widgets/state_city_row.dart';
 import 'package:astrologer/ui/widgets/text_input.dart';
+import 'package:country_currency_pickers/country.dart';
+import 'package:country_currency_pickers/country_pickers.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -116,11 +120,29 @@ class _ProfileViewState extends State<ProfileView> with ValidationMixing {
                         value: model.accurateTime ?? false,
                       ),
                       UIHelper.verticalSpaceSmall,
-                      TextInput(
-                        title: "Country",
-                        prefixIcon: Icon(Icons.local_airport),
-                        controller: countryController,
-                        validator: isEmptyValidation,
+                      Row(
+                        children: [
+                          Flexible(
+                            flex:2,
+                            child: TextInput(
+                              title: "Country",
+                              readOnly: true,
+                              prefixIcon: Icon(Icons.local_airport),
+                              controller: countryController,
+                              validator: isEmptyValidation,
+                            ),
+                          ),
+                          Flexible(
+                            flex: 0,
+                            child: CountryPickerDropdown(
+                              initialValue: "us",
+                              itemBuilder: _buildDropdownItem,
+                              onValuePicked: (Country country) {
+                                countryController.text=country.name;
+                              },
+                            ),
+                          ),
+                        ],
                       ),
                       UIHelper.verticalSpaceMedium,
                       StateCityRow(
@@ -174,6 +196,18 @@ class _ProfileViewState extends State<ProfileView> with ValidationMixing {
             ),
     );
   }
+
+  Widget _buildDropdownItem(Country country) => Container(
+    child: Row(
+      children: <Widget>[
+        CountryPickerUtils.getDefaultFlagImage(country),
+        SizedBox(
+          width: 8.0,
+        ),
+        Text("${country.currencyCode}"),
+      ],
+    ),
+  );
 
   handleUpdateClick(ProfileViewModel model, BuildContext context) async {
     if (formKey.currentState.validate()) {

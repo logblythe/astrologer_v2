@@ -86,6 +86,7 @@ class HomeService {
 
   List<AstrologerModel> get astrologers => _astrologers;
 
+  /// TO get device id according to platform.
   Future<void> initPlatformState() async {
     try {
       _deviceId = await PlatformDeviceId.getDeviceId;
@@ -104,6 +105,7 @@ class HomeService {
     _user = await _db.getLoggedInUser();
     await initPlatformState();
     UserHistory history = await _api.fetchUserHistory(deviceId: _deviceId);
+
     UserDetailsWithQA details = history.userDetailsWithQA;
     if (details != null) {
       UserModel user = UserModel(

@@ -5,13 +5,15 @@ class ESewaHelper {
   /// [MethodChannel] invoke relation to native platform.
   /// Checkout for more info https://flutter.dev/docs/development/platform-integration/platform-channels?tab=ios-channel-objective-c-tab
   static const platformChannel= const MethodChannel("cosmos-eSewa");
-
+  /// ESewa [Environments] are keys to switch between test and live server
   static const test = "ENVIRONMENT_TEST";
   static const live = "ENVIRONMENT_LIVE";
+
   static const testClientId = "JB0BBQ4aD0UqIThFJwAKBgAXEUkEGQUBBAwdOgABHD4DChwUAB0R";
   static const testSecretKey = "BhwIWQQADhIYSxILExMcAgFXFhcOBwAKBgAXEQ==";
 
   Map<String, dynamic> initPayment(ESewaPayment payment) {
+    // TODO : Environment must be change to live during deployment.
     var _paymentDetails = ESewaPayment().toMap(payment);
     var _eSewaConfig = {
       "clientId": "$testClientId",

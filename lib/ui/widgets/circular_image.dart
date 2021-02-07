@@ -4,6 +4,7 @@ import 'package:astrologer/ui/shared/ui_helpers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class CircularImage extends StatefulWidget {
   final Function(File image) onImageCaptured;
@@ -82,14 +83,25 @@ class _CircularImageState extends State<CircularImage> {
     }
   }
 
-  Future getImage(ImageSource source) async {
-    var image = await ImagePicker.pickImage(source: source);
-    if (image != null) {
-      setState(() {
-        _image = image;
-        _imageUrl = null;
-      });
-      widget.onImageCaptured(image);
+  Future getImage(ImageSource source, Permission permission) async {
+    print(permission);
+    PermissionStatus status = await permission.status;
+    print(status);
+    if (status.isPermanentlyDenied) await openAppSettings();
+
+    if (status.isUndetermined || status.isDenied) {
+      status = await permission.request();
+      if (status.isDenied && Platform.isIOS) await openAppSettings();
+    }
+    if (status.isGranted) {
+      var image = await ImagePicker.pickImage(source: source);
+      if (image != null) {
+        setState(() {
+          _image = image;
+          _imageUrl = null;
+        });
+        widget.onImageCaptured(image);
+      }
     }
   }
 
@@ -131,7 +143,7 @@ class _CircularImageState extends State<CircularImage> {
                 ),
                 onTap: () {
                   Navigator.of(context).pop();
-                  getImage(ImageSource.camera);
+                  getImage(ImageSource.camera, Permission.camera);
                 },
               ),
               UIHelper.verticalSpaceMedium,
@@ -142,7 +154,7 @@ class _CircularImageState extends State<CircularImage> {
                 ),
                 onTap: () {
                   Navigator.of(context).pop();
-                  getImage(ImageSource.gallery);
+                  getImage(ImageSource.gallery, Platform.isIOS?Permission.photos:Permission.storage);
                 },
               ),
               UIHelper.verticalSpaceMedium,

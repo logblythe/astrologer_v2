@@ -144,11 +144,11 @@ class _DashboardViewState extends State<DashboardView>
       } else {
         var _message =
             MessageModel(message: _messageController.text.trim(), sent: true);
+        await model.addMessage(_message);
+        await model.askQuestion(_message);
         final _listState = widget.listKey.currentState;
         if (_listState != null)
           _listState.insertItem(0, duration: Duration(milliseconds: 500));
-        await model.addMessage(_message);
-        await model.askQuestion(_message);
       }
     }
   }
@@ -181,7 +181,7 @@ class _DashboardViewState extends State<DashboardView>
             context: context,
             builder: (context) {
               return PaymentSelection(
-                onEsewaSelect: () => model.handleEsewaSelect(),
+                onEsewaSelect: () => model.handleESewaSelect(),
                 onKhaltiSelect: () => model.handleKhaltiSelect(),
               );
             });

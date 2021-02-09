@@ -128,7 +128,7 @@ class DashboardViewModel extends BaseViewModel {
     super.dispose();
   }
 
-  handleEsewaSelect() {
+  handleESewaSelect() {
     ESewaPayment payment = ESewaPayment(
         productPrice: 1.0,
         productName: "test",

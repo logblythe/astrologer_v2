@@ -66,6 +66,7 @@ class _DateTimeRowState extends State<DateTimeRow> with ValidationMixing {
                   setState(() {
                     if (selectedDate != null) date = selectedDate;
                   });
+                  if(date!=null)
                   widget.dateController.text =
                       DateFormat("yyyy-MM-d").format(date);
                 }

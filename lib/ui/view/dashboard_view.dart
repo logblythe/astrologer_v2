@@ -109,7 +109,7 @@ class _DashboardViewState extends State<DashboardView>
                           BorderSide(color: Theme.of(context).primaryColor),
                       borderRadius: BorderRadius.circular(25.0)),
                   border: InputBorder.none,
-                  hintText: 'Type message...'),
+                  hintText: 'Type your question here...'),
             ),
           ),
           AnimatedCrossFade(

@@ -7,6 +7,7 @@ class UserModel {
   String city;
   String state;
   String country;
+  String countryIso;
   String role;
   String dateOfBirth;
   String birthTime;
@@ -24,6 +25,7 @@ class UserModel {
     this.city,
     this.state,
     this.country,
+    this.countryIso,
     this.role,
     this.dateOfBirth,
     this.birthTime,
@@ -48,6 +50,7 @@ class UserModel {
         city = json['city'],
         state = json['state'],
         country = json['country'],
+        countryIso = json['countryIso'],
         role = json['role'],
         dateOfBirth = json['dateOfBirth'],
         birthTime = json['birthTime'],
@@ -65,6 +68,7 @@ class UserModel {
         city = json['city'],
         state = json['state'],
         country = json['country'],
+        countryIso = json['countryIso'],
         role = json['role'],
         dateOfBirth = json['dateOfBirth'],
         birthTime = json['birthTime'],
@@ -81,6 +85,7 @@ class UserModel {
         "city": city,
         "state": state,
         "country": country,
+        "countryIso": countryIso,
         "role": role,
         "dateOfBirth": dateOfBirth,
         "birthTime": birthTime,
@@ -97,6 +102,7 @@ class UserModel {
         "city": city,
         "state": state,
         "country": country,
+        "countryIso": countryIso,
         "role": role,
         "dateOfBirth": dateOfBirth,
         "birthTime": birthTime,

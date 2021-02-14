@@ -1,7 +1,9 @@
+import 'package:astrologer/core/constants/end_points.dart';
 import 'package:astrologer/core/data_model/user_model.dart';
 import 'package:astrologer/core/enum/gender.dart';
 import 'package:astrologer/core/utils/native_date_picker.dart';
 import 'package:astrologer/core/validator_mixin.dart';
+import 'package:astrologer/core/view_model/view/home_view_model.dart';
 import 'package:astrologer/core/view_model/view/profile_view_model.dart';
 import 'package:astrologer/ui/base_widget.dart';
 import 'package:astrologer/ui/shared/ui_helpers.dart';
@@ -123,7 +125,7 @@ class _ProfileViewState extends State<ProfileView> with ValidationMixing {
                       Row(
                         children: [
                           Flexible(
-                            flex:2,
+                            flex: 2,
                             child: TextInput(
                               title: "Country",
                               readOnly: true,
@@ -134,13 +136,24 @@ class _ProfileViewState extends State<ProfileView> with ValidationMixing {
                           ),
                           Flexible(
                             flex: 0,
-                            child: CountryPickerDropdown(
-                              initialValue: "us",
-                              itemBuilder: _buildDropdownItem,
-                              onValuePicked: (Country country) {
-                                countryController.text=country.name;
-                              },
-                            ),
+                            child: !model.busy
+                                ? CountryPickerDropdown(
+                                    initialValue:
+                                        "${model.countryIso?.toLowerCase() ?? "us"}",
+                                    itemBuilder: _buildDropdownItem,
+                                    onValuePicked: (Country country) {
+                                      countryController.text = country.name;
+                                      model.handleCountryIsoSelection(
+                                          country.isoCode.toLowerCase());
+                                    },
+                                  )
+                                : LimitedBox(
+                                    maxHeight: 20,
+                                    maxWidth: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 3,
+                                    ),
+                                  ),
                           ),
                         ],
                       ),
@@ -198,16 +211,16 @@ class _ProfileViewState extends State<ProfileView> with ValidationMixing {
   }
 
   Widget _buildDropdownItem(Country country) => Container(
-    child: Row(
-      children: <Widget>[
-        CountryPickerUtils.getDefaultFlagImage(country),
-        SizedBox(
-          width: 8.0,
+        child: Row(
+          children: <Widget>[
+            CountryPickerUtils.getDefaultFlagImage(country),
+            SizedBox(
+              width: 8.0,
+            ),
+            Text("${country.iso3Code}"),
+          ],
         ),
-        Text("${country.currencyCode}"),
-      ],
-    ),
-  );
+      );
 
   handleUpdateClick(ProfileViewModel model, BuildContext context) async {
     if (formKey.currentState.validate()) {
@@ -217,15 +230,16 @@ class _ProfileViewState extends State<ProfileView> with ValidationMixing {
       }
       List<String> name = nameController.text.trim().split(" ");
       user.firstName = nameController.text.split(" ").elementAt(0);
-      if(name.length>1){
+      if (name.length > 1) {
         user.lastName = nameController.text.split(" ").elementAt(1) ?? "";
-      }else{
-        user.lastName="";
+      } else {
+        user.lastName = "";
       }
       user.phoneNumber = phoneController.text;
       user.city = locationController.text;
       user.state = stateController.text;
       user.country = countryController.text;
+      user.countryIso = model.countryIso;
       user.dateOfBirth = dateController.text;
       user.birthTime = timeController.text;
       user.accurateTime = model.accurateTime;
@@ -240,8 +254,13 @@ class _ProfileViewState extends State<ProfileView> with ValidationMixing {
           SnackBar(content: Text(response.errorMessage)),
         );
       } else {
-        Scaffold.of(context).showSnackBar(
-          SnackBar(content: Text('Updated successfully')),
+        Navigator.of(context).pop();
+        scaffoldHome.currentState.showSnackBar(
+          SnackBar(
+            content: Text('Updated successfully'),
+
+            duration: Duration(seconds: 2),
+          ),
         );
       }
     }
@@ -250,13 +269,16 @@ class _ProfileViewState extends State<ProfileView> with ValidationMixing {
   void initializeValue(ProfileViewModel model) {
     user = model.user;
     if (user != null) {
-      nameController.text = "${user.firstName} ${user.lastName??""}";
+      nameController.text = "${user.firstName} ${user.lastName ?? ""}";
       locationController.text = user.city;
       dateController.text = user.dateOfBirth;
       timeController.text = user.birthTime;
       stateController.text = user.state;
-      countryController.text = user.country;
+      countryController.text = user.country ?? "United States";
       phoneController.text = user.phoneNumber;
+      if (user.countryIso != null) {
+        model.countryIso = user.countryIso;
+      }
       if (user.gender != null) {
         model.selectedGender = user.gender == "M" ? Gender.male : Gender.female;
       }

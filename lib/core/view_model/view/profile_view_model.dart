@@ -10,10 +10,13 @@ class ProfileViewModel extends BaseViewModel {
   final HomeService _homeService;
   bool accurateTime = false;
   Gender selectedGender;
+  String countryIso;
 
   handleSwitch(value) => accurateTime = value;
 
   handleGenderSelection(gender) => selectedGender = gender;
+
+  handleCountryIsoSelection(iso) => countryIso = iso;
 
   String _imageUrl;
 
@@ -30,6 +33,7 @@ class ProfileViewModel extends BaseViewModel {
     await _userService.getLoggedInUser();
     accurateTime = user?.accurateTime;
     selectedGender = user?.gender == "M" ? Gender.male : Gender.female;
+    countryIso = user?.countryIso??"us";
     setBusy(false);
   }
 

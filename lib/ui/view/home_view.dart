@@ -1,4 +1,5 @@
 import 'package:astrologer/connectivity_mixin.dart';
+import 'package:astrologer/core/constants/end_points.dart';
 import 'package:astrologer/core/data_model/notification_model.dart';
 import 'package:astrologer/core/message_listener.dart';
 import 'package:astrologer/core/view_model/view/home_view_model.dart';
@@ -45,6 +46,7 @@ class _HomeViewState extends State<HomeView> with ConnectivityMixin {
         initConnectivity(_homeViewModel);
       },
       builder: (context, HomeViewModel model, _) => Scaffold(
+        key: scaffoldHome,
         drawer: _buildDrawer(model),
         appBar: AppBar(
           elevation: 0,

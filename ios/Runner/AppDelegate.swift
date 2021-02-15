@@ -50,7 +50,7 @@ import EsewaSDK
     
     func onEsewaSDKPaymentSuccess(info:[String:Any]) {
         var value = Dictionary<String, Any>()
-        value["success"] = true
+        value["isSuccess"] = true
         value["message"] = info
         result?(value)
         result = nil
@@ -58,7 +58,7 @@ import EsewaSDK
 
     func onEsewaSDKPaymentError(errorDescription: String) {
         var value = Dictionary<String, Any>()
-        value["success"] = false
+        value["isSuccess"] = false
         value["message"] = errorDescription
         result?(value)
         result = nil

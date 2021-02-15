@@ -129,16 +129,21 @@ class DashboardViewModel extends BaseViewModel {
     super.dispose();
   }
 
-  handleESewaSelect() async{
+  handleESewaSelect() async {
     var uuid = Uuid();
     var productId = uuid.v4();
     ESewaPayment payment = ESewaPayment(
-      /// Actual cost must be implement here.
+
+        /// Actual cost must be implement here.
         productPrice: 1.0,
         productName: "Astrology Question",
         productId: productId,
         callBackUrl: "");
     var response = await ESewaHelper().initPayment(payment);
+
+    /// Response contain two parameter [isSuccess] [message]
+    /// isSuccess return true when transaction is successfully and false when transaction is failed.
+    /// on error its only contain  error message string but when success its contain response of transaction.
     print(response);
   }
 

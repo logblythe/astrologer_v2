@@ -87,7 +87,7 @@ class _DashboardViewState extends State<DashboardView>
 
   buildInput(DashboardViewModel model) {
     return Align(
-      alignment: Alignment.center,
+      alignment: Alignment.bottomCenter,
       child: Container(
         color: Colors.white.withOpacity(.6),
         padding: const EdgeInsets.all(8.0),

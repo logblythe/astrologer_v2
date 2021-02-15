@@ -1,8 +1,13 @@
 import UIKit
 import Flutter
+import EsewaSDK
 
 @UIApplicationMain
-@objc class AppDelegate: FlutterAppDelegate {
+@objc class AppDelegate: FlutterAppDelegate, EsewaSDKPaymentDelegate {
+    //Instanace of esewa sdk
+    var sdk: EsewaSDK?
+    
+    var result: FlutterResult?
     
   override func application(
     _ application: UIApplication,
@@ -16,8 +21,12 @@ import Flutter
     let controller : FlutterViewController = window?.rootViewController as! FlutterViewController
     let eSewaChannel = FlutterMethodChannel(name: "cosmos-eSewa",binaryMessenger: controller.binaryMessenger)
     eSewaChannel.setMethodCallHandler({
-          (call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
-          
+          [weak self](call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
+        guard call.method == "initiate_eSewa_gateway" else {
+            result(FlutterMethodNotImplemented)
+            return
+          }
+        self?.initESewaPayment(view: controller, res: result, arguments:call.arguments as! Array<Dictionary<String, String>>)
         })
     
     
@@ -25,15 +34,33 @@ import Flutter
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
     
-    private func initESewaPayment(result: FlutterResult) {
-      let device = UIDevice.current
-      device.isBatteryMonitoringEnabled = true
-      if device.batteryState == UIDevice.BatteryState.unknown {
-        result(FlutterError(code: "UNAVAILABLE",
-                            message: "Battery info unavailable",
-                            details: nil))
-      } else {
-        result(Int(device.batteryLevel * 100))
-      }
+    private func initESewaPayment(view:FlutterViewController ,res: @escaping FlutterResult,arguments:Array<Dictionary<String,String>>) {
+        result = res;
+        let envLive:String = "ENVIRONMENT_LIVE";
+    
+        //Parsing Argument data from method channel
+        let config:Dictionary<String,String> = arguments[0];
+        let productData:Dictionary<String,String> = arguments[1];
+        
+        //Esewa Configuration Data
+        sdk = EsewaSDK(inViewController: view, environment: config["environment"]==envLive ?.production:.development, delegate: self)
+        
+        sdk?.initiatePayment(merchantId: productData["clientId"]!, merchantSecret: productData["secretKey"]!, productName: productData["productName"]!, productAmount: productData["productPrice"]!, productId: productData["productId"]!, callbackUrl: productData["callBackUrl"]!)
+    }
+    
+    func onEsewaSDKPaymentSuccess(info:[String:Any]) {
+        var value = Dictionary<String, Any>()
+        value["success"] = true
+        value["message"] = info
+        result?(value)
+        result = nil
+    }
+
+    func onEsewaSDKPaymentError(errorDescription: String) {
+        var value = Dictionary<String, Any>()
+        value["success"] = false
+        value["message"] = errorDescription
+        result?(value)
+        result = nil
     }
 }

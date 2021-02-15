@@ -34,6 +34,7 @@ dependencies:
   tuple: ^1.0.3
   country_currency_pickers: ^1.0.1
   permission_handler: ^5.1.0+2
+  uuid: 2.2.2
 
 dev_dependencies:
   flutter_test:

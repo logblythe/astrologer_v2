@@ -12,6 +12,7 @@ import 'package:astrologer/core/view_model/base_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:uuid/uuid.dart';
 
 class DashboardViewModel extends BaseViewModel {
   HomeService _homeService;
@@ -128,13 +129,17 @@ class DashboardViewModel extends BaseViewModel {
     super.dispose();
   }
 
-  handleESewaSelect() {
+  handleESewaSelect() async{
+    var uuid = Uuid();
+    var productId = uuid.v4();
     ESewaPayment payment = ESewaPayment(
+      /// Actual cost must be implement here.
         productPrice: 1.0,
-        productName: "test",
-        productId: "test1",
+        productName: "Astrology Question",
+        productId: productId,
         callBackUrl: "");
-    ESewaHelper().initPayment(payment);
+    var response = await ESewaHelper().initPayment(payment);
+    print(response);
   }
 
   handleKhaltiSelect() {

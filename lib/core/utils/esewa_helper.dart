@@ -4,15 +4,17 @@ import 'package:flutter/services.dart';
 class ESewaHelper {
   /// [MethodChannel] invoke relation to native platform.
   /// Checkout for more info https://flutter.dev/docs/development/platform-integration/platform-channels?tab=ios-channel-objective-c-tab
-  static const platformChannel= const MethodChannel("cosmos-eSewa");
+  static const platformChannel = const MethodChannel("cosmos-eSewa");
+
   /// ESewa [Environments] are keys to switch between test and live server
   static const test = "ENVIRONMENT_TEST";
   static const live = "ENVIRONMENT_LIVE";
 
-  static const testClientId = "JB0BBQ4aD0UqIThFJwAKBgAXEUkEGQUBBAwdOgABHD4DChwUAB0R";
+  static const testClientId =
+      "JB0BBQ4aD0UqIThFJwAKBgAXEUkEGQUBBAwdOgABHD4DChwUAB0R";
   static const testSecretKey = "BhwIWQQADhIYSxILExMcAgFXFhcOBwAKBgAXEQ==";
 
-  Map<String, dynamic> initPayment(ESewaPayment payment) {
+  Future<Map<String, dynamic>> initPayment(ESewaPayment payment) async {
     // TODO : Environment must be change to live during deployment.
     var _paymentDetails = ESewaPayment().toMap(payment);
     var _eSewaConfig = {
@@ -21,16 +23,13 @@ class ESewaHelper {
       "environment": "$test"
     };
 
-    var platformArg=[
-      _eSewaConfig,
-      _paymentDetails
-    ];
-    _invokePlatformMethodChannel(platformArg);
-    return {};
+    var platformArg = [_eSewaConfig, _paymentDetails];
+    return await _invokePlatformMethodChannel(platformArg);
   }
 
-  Future _invokePlatformMethodChannel(var arg) async{
-    var result =await platformChannel.invokeMethod("initiate_eSewa_gateway",arg);
+  Future<Map<String, dynamic>> _invokePlatformMethodChannel(var arg) async {
+    var result =
+        await platformChannel.invokeMethod("initiate_eSewa_gateway", arg);
     print(result);
     return result;
   }

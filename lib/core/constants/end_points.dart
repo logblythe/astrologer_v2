@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-const String baseUrl = "http://localhost:8082/api";
+const String baseUrl = "http://192.168.0.104:8082/api";
 // const String baseUrl = "http://a6eaf9fbedd4.ngrok.io/api";
 // const String baseUrl = "http://api.cosmosastrology.com/api";
 const String welcomeMessages = "$baseUrl/user/welcome-messages";

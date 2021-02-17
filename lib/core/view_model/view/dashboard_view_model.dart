@@ -1,18 +1,15 @@
 import 'dart:async';
 
 import 'package:astrologer/core/constants/end_points.dart';
-import 'package:astrologer/core/data_model/esewa_payment.dart';
 import 'package:astrologer/core/data_model/message_model.dart';
 import 'package:astrologer/core/data_model/user_model.dart';
 import 'package:astrologer/core/service/home_service.dart';
 import 'package:astrologer/core/service/user_service.dart';
-import 'package:astrologer/core/utils/esewa_helper.dart';
 import 'package:astrologer/core/utils/khalti_helper.dart';
 import 'package:astrologer/core/view_model/base_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:uuid/uuid.dart';
 
 class DashboardViewModel extends BaseViewModel {
   HomeService _homeService;
@@ -87,6 +84,17 @@ class DashboardViewModel extends BaseViewModel {
         print('handle error');
       } else {}
     });
+
+    ///manage eSewa Payment Status.
+    _homeService.eSewaHelper.purchaseStream.stream.listen((data) {
+      print(data);
+      if (data["status"] == PaymentStatus.purchased) {
+        setBusy(true);
+        _homeService.makeQuestionRequest(_question).then((value) {
+          setBusy(false);
+        });
+      } else if (data["status"] == PaymentStatus.error) {}
+    });
   }
 
   Future<void> addMessage(MessageModel message) async {
@@ -129,22 +137,8 @@ class DashboardViewModel extends BaseViewModel {
     super.dispose();
   }
 
-  handleESewaSelect() async {
-    var uuid = Uuid();
-    var productId = uuid.v4();
-    ESewaPayment payment = ESewaPayment(
-
-        /// Actual cost must be implement here.
-        productPrice: 1.0,
-        productName: "Astrology Question",
-        productId: productId,
-        callBackUrl: "");
-    var response = await ESewaHelper().initPayment(payment);
-
-    /// Response contain two parameter [isSuccess] [message]
-    /// isSuccess return true when transaction is successfully and false when transaction is failed.
-    /// on error its only contain  error message string but when success its contain response of transaction.
-    print(response);
+  handleESewaSelect() {
+    _homeService.eSewaHelper.initPayment();
   }
 
   handleKhaltiSelect() {

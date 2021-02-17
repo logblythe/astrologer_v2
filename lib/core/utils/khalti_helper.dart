@@ -33,6 +33,7 @@ class KhaltiHelper {
           "status": PaymentStatus.purchased,
           "data": data,
         });
+
       },
       onFaliure: (error) {
         _purchaseStream.sink.add({

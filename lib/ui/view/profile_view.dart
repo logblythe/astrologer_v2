@@ -37,7 +37,8 @@ class _ProfileViewState extends State<ProfileView> with ValidationMixing {
 
   final TextEditingController stateController = TextEditingController();
 
-  final TextEditingController countryController = TextEditingController();
+  final TextEditingController countryController =
+      TextEditingController(text: "United States");
 
   final TextEditingController phoneController = TextEditingController();
 
@@ -258,7 +259,6 @@ class _ProfileViewState extends State<ProfileView> with ValidationMixing {
         scaffoldHome.currentState.showSnackBar(
           SnackBar(
             content: Text('Updated successfully'),
-
             duration: Duration(seconds: 2),
           ),
         );

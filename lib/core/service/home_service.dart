@@ -8,6 +8,7 @@ import 'package:astrologer/core/data_model/user_history.dart';
 import 'package:astrologer/core/data_model/user_model.dart';
 import 'package:astrologer/core/service/api.dart';
 import 'package:astrologer/core/service/db_provider.dart';
+import 'package:astrologer/core/utils/esewa_helper.dart';
 import 'package:astrologer/core/utils/khalti_helper.dart';
 import 'package:astrologer/core/utils/purchase_helper.dart';
 import 'package:astrologer/core/utils/shared_pref_helper.dart';
@@ -23,6 +24,7 @@ class HomeService {
   final SharedPrefHelper _sharedPrefHelper;
   final PurchaseHelper _purchaseHelper;
   final KhaltiHelper _khaltiHelper;
+  final ESewaHelper _eSewaHelper;
 
   int _prevQuesId;
 
@@ -32,11 +34,13 @@ class HomeService {
     @required SharedPrefHelper sharedPrefHelper,
     @required PurchaseHelper purchaseHelper,
     @required KhaltiHelper khaltiHelper,
+    @required ESewaHelper eSewaHelper,
   })  : _db = db,
         _api = api,
         _sharedPrefHelper = sharedPrefHelper,
         _purchaseHelper = purchaseHelper,
-        _khaltiHelper = khaltiHelper;
+        _khaltiHelper = khaltiHelper,
+        _eSewaHelper = eSewaHelper;
 
   PublishSubject<MessageAndUpdate> _newMessage = PublishSubject();
   PublishSubject<int> _freeCountStream = PublishSubject();
@@ -59,6 +63,8 @@ class HomeService {
   SharedPrefHelper get prefHelper => _sharedPrefHelper;
 
   KhaltiHelper get khaltiHelper => _khaltiHelper;
+
+  ESewaHelper get eSewaHelper => _eSewaHelper;
 
   get ideas => _ideas;
 

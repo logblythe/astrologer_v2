@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:astrologer/core/data_model/esewa_payment.dart';
+import 'package:astrologer/core/service/home_service.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:uuid/uuid.dart';
 
@@ -18,27 +20,34 @@ class ESewaHelper {
       "JB0BBQ4aD0UqIThFJwAKBgAXEUkEGQUBBAwdOgABHD4DChwUAB0R";
   static const testSecretKey = "BhwIWQQADhIYSxILExMcAgFXFhcOBwAKBgAXEQ==";
 
+  //For Production
+  static const liveClientId =
+      "JAAMFg9TJgoLBB9FMgUGCAQNDBwLVzEBBAgWERoKGVs9O0g8Nl4kJCgyJSg=";
+  static const liveSecretKey = "BhwIWQAAAgQXCBwXFg1dDhUYHA==";
+
   StreamController<Map> _purchaseStream = StreamController.broadcast();
 
   get purchaseStream => _purchaseStream;
 
-  Future<void> initPayment() async {
+  Future<void> initPayment(HomeService homeService) async {
     // Unique Id for every payment invoke.
     var uuid = Uuid();
     var productId = uuid.v4();
 
+    print(homeService.priceAfterDiscount);
     ESewaPayment payment = ESewaPayment(
         // Actual cost must be implement here.
-        productPrice: 1.0,
-        productName: "Astrology Question",
+        productPrice: homeService.priceAfterDiscount*116,
+        productName: "Question to astrologer.",
         productId: productId,
         callBackUrl: "");
+    print(payment.toMap(payment));
 
     var _paymentDetails = ESewaPayment().toMap(payment);
     var _eSewaConfig = {
-      "clientId": "$testClientId",
-      "secretKey": "$testSecretKey",
-      "environment": "$test"
+      "clientId": "$liveClientId",
+      "secretKey": "$liveSecretKey",
+      "environment": "$live"
     };
 
     var platformArg = [_eSewaConfig, _paymentDetails];
@@ -50,8 +59,12 @@ class ESewaHelper {
     /// isSuccess return true when transaction is successfully and false when transaction is failed.
     /// on error its only contain  error message string but when success its contain response of transaction.
 
-    var result =
-        await platformChannel.invokeMethod("initiate_eSewa_gateway", arg);
+    var result;
+    try {
+      result =await platformChannel.invokeMethod("initiate_eSewa_gateway", arg);
+    } on PlatformException catch(e){
+    print(e);
+    }
 
     if (result["isSuccess"]) {
       _purchaseStream.sink.add({
@@ -66,6 +79,8 @@ class ESewaHelper {
       });
     }
   }
+
+
 
   void dispose() {
     _purchaseStream.close();

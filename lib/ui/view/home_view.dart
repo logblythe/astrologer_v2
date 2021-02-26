@@ -40,6 +40,7 @@ class _HomeViewState extends State<HomeView> with ConnectivityMixin {
     return BaseWidget<HomeViewModel>(
       model: _homeViewModel,
       onModelReady: (_homeViewModel) async {
+        _homeViewModel.initIpGeolocation();
         _homeViewModel.getFreeQuesCount();
         _homeViewModel.getLoggedInUser();
         _homeViewModel.fetchQuestionPrice();

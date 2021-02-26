@@ -1,3 +1,4 @@
+import 'package:astrologer/core/constants/end_points.dart';
 import 'package:astrologer/core/data_model/message_model.dart';
 import 'package:astrologer/core/view_model/view/dashboard_view_model.dart';
 import 'package:astrologer/ui/base_widget.dart';
@@ -175,7 +176,6 @@ class _DashboardViewState extends State<DashboardView>
   void handleModelReady(DashboardViewModel model) {
     model.init();
     model.showBottomSheet.stream.listen((event) async {
-      print('event $event');
       if (event) {
         var response = await showModalBottomSheet(
             context: context,
@@ -185,7 +185,11 @@ class _DashboardViewState extends State<DashboardView>
                 onKhaltiSelect: () => model.handleKhaltiSelect(),
               );
             });
-        print('the response $response');
+        if(response==null){
+          model.updateQuestionStatusById(QuestionStatus.NOT_DELIVERED);
+        }
+      }else{
+        Navigator.of(context).pop();
       }
     });
   }

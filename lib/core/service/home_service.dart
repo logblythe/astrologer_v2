@@ -53,6 +53,7 @@ class HomeService {
   double _questionPrice;
   double _discountInPercentage;
   String _deviceId;
+  bool _isFromNepal;
 
   String get deviceId => _deviceId;
 
@@ -77,6 +78,8 @@ class HomeService {
   double get questionPrice => _questionPrice;
 
   double get discountInPercentage => _discountInPercentage;
+
+  bool get isFromNepal => _isFromNepal;
 
   addMsgToSink(String message, update) {
     _newMessage.sink.add(MessageAndUpdate(message, update));
@@ -231,13 +234,10 @@ class HomeService {
   }
 
   Future<bool> isRequestFromNepal() async {
-    bool isNepali = await _sharedPrefHelper.getBool(KEY_NEPALI);
-    if (isNepali == null) {
-      bool nepali = await _api.isRequestFromNepal();
-      _sharedPrefHelper.setBool(KEY_NEPALI, nepali);
-      return nepali;
-    }
-    return isNepali;
+    bool nepali = await _api.ipGeoLocation();
+    _isFromNepal = nepali;
+    _sharedPrefHelper.setBool(KEY_NEPALI, nepali);
+    return nepali;
   }
 }
 

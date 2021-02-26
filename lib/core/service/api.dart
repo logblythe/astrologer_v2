@@ -149,4 +149,12 @@ class Api {
     String country = resMap["location"]["country"];
     return country == "NP";
   }
+
+  Future<bool> ipGeoLocation() async {
+    var response = await client.get("http://api.ipstack.com/check?access_key=$ipStack_Key");
+    Map<String, dynamic> resMap = jsonDecode(response.body);
+    String countryCode = resMap["country_code"];
+    String countryName = resMap["country_name"];
+    return countryCode=="NP";
+  }
 }

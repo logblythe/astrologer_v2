@@ -17,6 +17,7 @@ const String GENDER = "gender";
 const String CITY = "city";
 const String STATE = "state";
 const String COUNTRY = "country";
+const String COUNTRY_ISO = "countryIso";
 const String ROLE = "role";
 const String DOB = "dateOfBirth";
 const String BIRTH_TIME = "birthTime";
@@ -94,9 +95,36 @@ class DbProvider {
          $DEVICE_TOKEN text)''');
   }
 
-  void _updateTableUserV1toV2(Batch batch) {
+  void _createTableUserV3(Batch batch) {
+    batch.execute('DROP TABLE IF EXISTS user');
+    batch.execute('''create table if not exists user(
+         $ID integer primary key autoincrement,
+         $USER_ID integer,
+         $FIRST_NAME text,
+         $LAST_NAME text,
+         $EMAIL text,
+         $PASSWORD text,
+         $PHONE text,
+         $GENDER text,
+         $CITY text,
+         $STATE text,
+         $COUNTRY text,
+         $COUNTRY_ISO text,
+         $ROLE text,
+         $DOB text,
+         $BIRTH_TIME text,
+         $ACC_TIME integer,
+         $PROFILE_IMAGE text,
+         $DEVICE_TOKEN text)''');
+  }
+
+  void _updateTableUserV1toV3(Batch batch) {
     batch.execute(
-        '''ALTER TABLE USER ADD $PROFILE_IMAGE TEXT, $DEVICE_TOKEN TEXT''');
+        '''ALTER TABLE USER ADD $PROFILE_IMAGE TEXT, $DEVICE_TOKEN TEXT, $COUNTRY_ISO TEXT''');
+  }
+
+  void _updateTableUserV2toV3(Batch batch) {
+    batch.execute('''ALTER TABLE USER ADD $COUNTRY_ISO TEXT''');
   }
 
   Future<Database> init() async {
@@ -104,17 +132,21 @@ class DbProvider {
     final path = join(documentsDirectory.path, 'eventus.db');
     db = await openDatabase(
       path,
-      version: 2,
+      version: 3,
       onCreate: (database, version) async {
         Batch batch = database.batch();
-        _createTableUserV2(batch);
+        _createTableUserV3(batch);
         _createTableMessageV1(batch);
         await batch.commit();
       },
       onUpgrade: (database, int oldVersion, int newVersion) async {
+        print('$oldVersion - $newVersion');
         Batch batch = database.batch();
         if (oldVersion == 1) {
-          _updateTableUserV1toV2(batch);
+          _updateTableUserV1toV3(batch);
+        }
+        if (oldVersion == 3) {
+          _updateTableUserV2toV3(batch);
         }
       },
       onConfigure: onConfigure,

@@ -78,11 +78,30 @@ class DashboardViewModel extends BaseViewModel {
         updateQuestionStatusById(QuestionStatus.NOT_DELIVERED);
       }
     });
+
     _homeService.khaltiHelper.purchaseStream.stream.listen((map) {
-      print('${PaymentStatus.error}');
-      if (map["status"] == PaymentStatus.error) {
-        print('handle error');
-      } else {}
+      if (map["status"] == PaymentStatus.purchased) {
+        setBusy(true);
+        _homeService.makeQuestionRequest(_question).then((value) {
+          setBusy(false);
+        });
+      } else if (map["status"] == PaymentStatus.error) {
+        updateQuestionStatusById(QuestionStatus.NOT_DELIVERED);
+      }
+      showBottomSheet.sink.add(false);
+    });
+
+    ///manage eSewa Payment Status.
+    _homeService.eSewaHelper.purchaseStream.stream.listen((data) {
+      if (data["status"] == PaymentStatus.purchased) {
+        setBusy(true);
+        _homeService.makeQuestionRequest(_question).then((value) {
+          setBusy(false);
+        });
+      } else if (data["status"] == PaymentStatus.error) {
+        updateQuestionStatusById(QuestionStatus.NOT_DELIVERED);
+      }
+      showBottomSheet.sink.add(false);
     });
   }
 
@@ -95,23 +114,22 @@ class DashboardViewModel extends BaseViewModel {
   }
 
   askQuestion(MessageModel message) async {
-    showBottomSheet.sink.add(true);
-    //
-    // setBusy(true);
+    // showBottomSheet.sink.add(true);
+    setBusy(true);
     // await _homeService.makeQuestionRequest(_question);
-    // if (_homeService.isFree) {
-    //   await _homeService.makeQuestionRequest(_question);
-    // } else {
-    //   bool nepali = await _homeService.isRequestFromNepal();
-    //   if (nepali) {
-    //     print('the request is from nepal');
-    //     showBottomSheet.sink.add(true);
-    //   } else {
-    //     print('else the request is from nepal');
-    //     _homeService.purchaseHelper.purchase();
-    //   }
-    // }
-    // setBusy(false);
+    if (_homeService.isFree) {
+      await _homeService.makeQuestionRequest(_question);
+    } else {
+      bool nepali = _homeService.isFromNepal;
+      if (nepali) {
+        print('the request is from nepal');
+        showBottomSheet.sink.add(true);
+      } else {
+        print('else the request is from nepal');
+        _homeService.purchaseHelper.purchase();
+      }
+    }
+    setBusy(false);
   }
 
   updateQuestionStatusById(String status) async {
@@ -126,9 +144,11 @@ class DashboardViewModel extends BaseViewModel {
     super.dispose();
   }
 
-  handleEsewaSelect() {}
+  handleESewaSelect() {
+    _homeService.eSewaHelper.initPayment(_homeService);
+  }
 
   handleKhaltiSelect() {
-    _homeService.khaltiHelper.makePayment();
+    _homeService.khaltiHelper.initPayment(_homeService);
   }
 }

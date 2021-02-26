@@ -1,6 +1,8 @@
+import 'package:astrologer/core/utils/native_date_picker.dart';
 import 'package:astrologer/core/validator_mixin.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'dart:io' show Platform;
 
 class DateTimeRow extends StatefulWidget {
   final TextEditingController dateController;
@@ -47,16 +49,27 @@ class _DateTimeRowState extends State<DateTimeRow> with ValidationMixing {
                   FocusScope.of(context).requestFocus(widget.timeFocusNode),
               focusNode: widget.dateFocusNode,
               onTap: () async {
-                DateTime selectedDate = await showDatePicker(
-                    context: context,
-                    initialDate: currentDate,
-                    firstDate: DateTime(1980),
-                    lastDate: currentDate);
-                setState(() {
-                  if (selectedDate != null) date = selectedDate;
-                });
-                widget.dateController.text =
-                    DateFormat("yyyy-MM-d").format(date);
+                if (Platform.isAndroid) {
+                  String selectedDate =
+                      await DatePickerHelper().invokePlatformMethodChannel();
+                  setState(() {
+                    if (selectedDate != null)
+                      date = DateTime.parse(selectedDate);
+                  });
+                  widget.dateController.text = selectedDate;
+                } else {
+                  DateTime selectedDate = await showDatePicker(
+                      context: context,
+                      initialDate: currentDate,
+                      firstDate: DateTime(1980),
+                      lastDate: currentDate);
+                  setState(() {
+                    if (selectedDate != null) date = selectedDate;
+                  });
+                  if(date!=null)
+                  widget.dateController.text =
+                      DateFormat("yyyy-MM-d").format(date);
+                }
               },
               decoration: InputDecoration(
                 prefixIcon: Icon(Icons.calendar_today),

@@ -9,6 +9,7 @@ class UserDetailsWithQA {
   String city;
   String state;
   String country;
+  String countryIso;
   String profileImageUrl;
   String dateOfBirth;
   String birthTime;
@@ -26,6 +27,7 @@ class UserDetailsWithQA {
       this.city,
       this.state,
       this.country,
+        this.countryIso,
       this.profileImageUrl,
       this.dateOfBirth,
       this.birthTime,
@@ -43,6 +45,7 @@ class UserDetailsWithQA {
     city = json['city'];
     state = json['state'];
     country = json['country'];
+    countryIso = json['countryIso'];
     profileImageUrl = json['profileImageUrl'];
     dateOfBirth = json['dateOfBirth'];
     birthTime = json['birthTime'];
@@ -67,6 +70,7 @@ class UserDetailsWithQA {
     data['city'] = this.city;
     data['state'] = this.state;
     data['country'] = this.country;
+    data['countryIso'] = this.countryIso;
     data['profileImageUrl'] = this.profileImageUrl;
     data['dateOfBirth'] = this.dateOfBirth;
     data['birthTime'] = this.birthTime;

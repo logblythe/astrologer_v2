@@ -13,10 +13,19 @@ class HomeViewModel extends BaseViewModel {
   int _index = 0;
   bool _internetConnection = true;
 
+  bool _isNepal = false;
+
   bool get internetConnection => _internetConnection;
 
   set internetConnection(bool value) {
     _internetConnection = value;
+    notifyListeners();
+  }
+
+  bool get isNepal => _homeService.isFromNepal;
+
+  set isNepal(bool value) {
+    _isNepal = value;
     notifyListeners();
   }
 
@@ -65,6 +74,12 @@ class HomeViewModel extends BaseViewModel {
   fetchQuestionPrice() async {
     setBusy(true);
     await _homeService.fetchQuestionPrice();
+    setBusy(false);
+  }
+
+  initIpGeolocation() async {
+    setBusy(true);
+    await _homeService.isRequestFromNepal();
     setBusy(false);
   }
 }

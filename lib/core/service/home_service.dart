@@ -8,6 +8,7 @@ import 'package:astrologer/core/data_model/user_history.dart';
 import 'package:astrologer/core/data_model/user_model.dart';
 import 'package:astrologer/core/service/api.dart';
 import 'package:astrologer/core/service/db_provider.dart';
+import 'package:astrologer/core/utils/esewa_helper.dart';
 import 'package:astrologer/core/utils/khalti_helper.dart';
 import 'package:astrologer/core/utils/purchase_helper.dart';
 import 'package:astrologer/core/utils/shared_pref_helper.dart';
@@ -23,6 +24,7 @@ class HomeService {
   final SharedPrefHelper _sharedPrefHelper;
   final PurchaseHelper _purchaseHelper;
   final KhaltiHelper _khaltiHelper;
+  final ESewaHelper _eSewaHelper;
 
   int _prevQuesId;
 
@@ -32,11 +34,13 @@ class HomeService {
     @required SharedPrefHelper sharedPrefHelper,
     @required PurchaseHelper purchaseHelper,
     @required KhaltiHelper khaltiHelper,
+    @required ESewaHelper eSewaHelper,
   })  : _db = db,
         _api = api,
         _sharedPrefHelper = sharedPrefHelper,
         _purchaseHelper = purchaseHelper,
-        _khaltiHelper = khaltiHelper;
+        _khaltiHelper = khaltiHelper,
+        _eSewaHelper = eSewaHelper;
 
   PublishSubject<MessageAndUpdate> _newMessage = PublishSubject();
   PublishSubject<int> _freeCountStream = PublishSubject();
@@ -49,6 +53,7 @@ class HomeService {
   double _questionPrice;
   double _discountInPercentage;
   String _deviceId;
+  bool _isFromNepal;
 
   String get deviceId => _deviceId;
 
@@ -59,6 +64,8 @@ class HomeService {
   SharedPrefHelper get prefHelper => _sharedPrefHelper;
 
   KhaltiHelper get khaltiHelper => _khaltiHelper;
+
+  ESewaHelper get eSewaHelper => _eSewaHelper;
 
   get ideas => _ideas;
 
@@ -71,6 +78,8 @@ class HomeService {
   double get questionPrice => _questionPrice;
 
   double get discountInPercentage => _discountInPercentage;
+
+  bool get isFromNepal => _isFromNepal;
 
   addMsgToSink(String message, update) {
     _newMessage.sink.add(MessageAndUpdate(message, update));
@@ -86,6 +95,7 @@ class HomeService {
 
   List<AstrologerModel> get astrologers => _astrologers;
 
+  /// TO get device id according to platform.
   Future<void> initPlatformState() async {
     try {
       _deviceId = await PlatformDeviceId.getDeviceId;
@@ -104,6 +114,7 @@ class HomeService {
     _user = await _db.getLoggedInUser();
     await initPlatformState();
     UserHistory history = await _api.fetchUserHistory(deviceId: _deviceId);
+
     UserDetailsWithQA details = history.userDetailsWithQA;
     if (details != null) {
       UserModel user = UserModel(
@@ -115,6 +126,7 @@ class HomeService {
         city: details.city,
         state: details.state,
         country: details.country,
+        countryIso: details.countryIso,
         dateOfBirth: details.dateOfBirth,
         birthTime: details.birthTime,
         accurateTime: details.accurateTime,
@@ -222,13 +234,10 @@ class HomeService {
   }
 
   Future<bool> isRequestFromNepal() async {
-    bool isNepali = await _sharedPrefHelper.getBool(KEY_NEPALI);
-    if (isNepali == null) {
-      bool nepali = await _api.isRequestFromNepal();
-      _sharedPrefHelper.setBool(KEY_NEPALI, nepali);
-      return nepali;
-    }
-    return isNepali;
+    bool nepali = await _api.ipGeoLocation();
+    _isFromNepal = nepali;
+    _sharedPrefHelper.setBool(KEY_NEPALI, nepali);
+    return nepali;
   }
 }
 

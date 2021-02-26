@@ -64,6 +64,15 @@ android {
             minifyEnabled false
         }
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    repositories {
+        flatDir {dirs 'libs'}
+    }
 }
 
 flutter {
@@ -71,5 +80,11 @@ flutter {
 }
 
 dependencies {
+    compile(name: 'eSewaSdk', ext: 'aar')
+    implementation 'androidx.cardview:cardview:1.0.0'
+    implementation 'com.google.android.material:material:1.2.1'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation ("com.khalti:khalti-android:2.00.01") {
+        transitive = true
+    }
 }

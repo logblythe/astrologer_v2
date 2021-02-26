@@ -1,3 +1,4 @@
+import 'package:astrologer/core/constants/end_points.dart';
 import 'package:astrologer/core/data_model/message_model.dart';
 import 'package:astrologer/core/view_model/view/dashboard_view_model.dart';
 import 'package:astrologer/ui/base_widget.dart';
@@ -35,23 +36,25 @@ class _DashboardViewState extends State<DashboardView>
               TextSelection.collapsed(offset: _messageController.text.length);
         return GestureDetector(
           onTap: () => _messageFocusNode.unfocus(),
-          child: Stack(
-            children: <Widget>[
-              Image.asset(
-                "assets/images/background.png",
-                fit: BoxFit.fill,
-                width: MediaQuery.of(context).size.width,
-              ),
-              AnimatedContainer(
-                duration: Duration(milliseconds: 500),
-                child: Column(
-                  children: <Widget>[
-                    buildListMessage(model),
-                    buildInput(model),
-                  ],
+          child: SafeArea(
+            child: Stack(
+              children: <Widget>[
+                Image.asset(
+                  "assets/images/background.png",
+                  fit: BoxFit.fill,
+                  width: MediaQuery.of(context).size.width,
                 ),
-              ),
-            ],
+                AnimatedContainer(
+                  duration: Duration(milliseconds: 500),
+                  child: Column(
+                    children: <Widget>[
+                      buildListMessage(model),
+                      buildInput(model),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         );
       },
@@ -107,7 +110,7 @@ class _DashboardViewState extends State<DashboardView>
                           BorderSide(color: Theme.of(context).primaryColor),
                       borderRadius: BorderRadius.circular(25.0)),
                   border: InputBorder.none,
-                  hintText: 'Type message...'),
+                  hintText: 'Type your question here...'),
             ),
           ),
           AnimatedCrossFade(
@@ -143,10 +146,10 @@ class _DashboardViewState extends State<DashboardView>
         var _message =
             MessageModel(message: _messageController.text.trim(), sent: true);
         final _listState = widget.listKey.currentState;
-        if (_listState != null)
-          _listState.insertItem(0, duration: Duration(milliseconds: 500));
         await model.addMessage(_message);
         await model.askQuestion(_message);
+        if (_listState != null)
+          _listState.insertItem(0, duration: Duration(milliseconds: 500));
       }
     }
   }
@@ -173,17 +176,20 @@ class _DashboardViewState extends State<DashboardView>
   void handleModelReady(DashboardViewModel model) {
     model.init();
     model.showBottomSheet.stream.listen((event) async {
-      print('event $event');
       if (event) {
         var response = await showModalBottomSheet(
             context: context,
             builder: (context) {
               return PaymentSelection(
-                onEsewaSelect: () => model.handleEsewaSelect(),
+                onEsewaSelect: () => model.handleESewaSelect(),
                 onKhaltiSelect: () => model.handleKhaltiSelect(),
               );
             });
-        print('the response $response');
+        if(response==null){
+          model.updateQuestionStatusById(QuestionStatus.NOT_DELIVERED);
+        }
+      }else{
+        Navigator.of(context).pop();
       }
     });
   }

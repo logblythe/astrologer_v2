@@ -10,6 +10,7 @@ class TextInput extends StatelessWidget {
   final TextInputType keyboardType;
   final String initialValue = "hello";
   final int maxLength;
+  final bool readOnly;
 
   const TextInput({
     Key key,
@@ -21,12 +22,14 @@ class TextInput extends StatelessWidget {
     this.validator,
     this.keyboardType,
     this.maxLength,
+    this.readOnly
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
       validator: validator,
+      readOnly: readOnly??false,
       decoration: InputDecoration(
         isDense: true,
         labelText: title,
@@ -35,6 +38,9 @@ class TextInput extends StatelessWidget {
         suffix: suffixIcon,
       ),
       obscureText: obscureText ?? false,
+      focusNode: FocusScopeNode(
+        canRequestFocus: false,
+      ),
       style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
       controller: controller,
       keyboardType: keyboardType,
